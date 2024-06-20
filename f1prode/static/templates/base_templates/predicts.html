@@ -1,0 +1,12 @@
+{% extends 'main.html' %}
+{% block content %}
+
+    <form method="POST">
+        {% for driver in drivers %}
+            <p>{{driver.first_name}} {{driver.last_name}} position: </p>
+            <input required type="number" placeholder="Prediction..." name="{{driver.first_name}}" /> 
+        {% endfor %}
+        <input type="submit" value="Submit" />
+    </form>
+
+{% endblock content %}

@@ -40,17 +40,20 @@ def home(request):
     f1_data_drivers = f1_data[-20:]
 
     context = {'data': f1_data_drivers}
-    return render(request, 'base/home.html', context)
+    return render(request, 'base_templates/home.html', context)
 
 
 def standings(request):
     drivers = Driver.objects.all()
 
     context = {'drivers': drivers}
-    return render(request, 'base/standings.html', context)
+    return render(request, 'base_templates/standings.html', context)
 
 def predict(request):
     drivers = Driver.objects.all()
 
     context = {'drivers': drivers}
-    return render(request, 'base/predicts.html', context)
+    return render(request, 'base_templates/predicts.html', context)
+
+def last_race(): #tener ultima carrera
+    return None
