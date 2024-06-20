@@ -1,4 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 import json
 import requests
 from .models import Driver
@@ -33,18 +35,15 @@ positions_to_points = {
     10: 1,
 }
 
-def register(request):
-    context = {}
-    return render(request, 'base_templates/register.html', context)
-
+@login_required()
+def logoutView(request):
+    logout(request)
+    return redirect('home')
 
 def home(request):
-    f1_data = requests.get('https://api.openf1.org/v1/drivers').json()
     #se pueden hacer las request ya con una caracteristica   ?driver_number=1
-    #['session_key'] es el valor de cada sesion y es igual por cada participante de la sesion
-    f1_data_drivers = f1_data[-20:]
 
-    context = {'data': f1_data_drivers}
+    context = {}
     return render(request, 'base_templates/home.html', context)
 
 
