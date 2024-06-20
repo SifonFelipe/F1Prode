@@ -2,6 +2,7 @@
 {% block content %}
 
     <form method="POST">
+        {% csrf_token %}
         {% for driver in drivers %}
             <p>{{driver.first_name}} {{driver.last_name}} position: </p>
             <input required type="number" placeholder="Prediction..." name="{{driver.first_name}}" /> 

@@ -33,6 +33,11 @@ positions_to_points = {
     10: 1,
 }
 
+def register(request):
+    context = {}
+    return render(request, 'base_templates/register.html', context)
+
+
 def home(request):
     f1_data = requests.get('https://api.openf1.org/v1/drivers').json()
     #se pueden hacer las request ya con una caracteristica   ?driver_number=1
