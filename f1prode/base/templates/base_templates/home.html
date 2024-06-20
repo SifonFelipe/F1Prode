@@ -1,7 +1,7 @@
 {% extends 'main.html' %}
 {% block content %}
-    <h1>Testing Api</h1>
-    {% for name in data %}
-        <p>{{name}}</p>
-    {% endfor %}
-{% ednblock content %}
+    <h2>Home Template</h2>
+    {% if request.user.is_authenticated %}
+        <p>Loged</p>
+    {% endif%}
+{% endblock content %}
