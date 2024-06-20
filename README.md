@@ -1,10 +1,10 @@
 # F1Prode
 A Website Designed to try to Guess F1 Races Results and Competing for Points Among Friends. Python Project
 
-##Api Usada:
+#Api Usada:
 https://openf1.org/
 
-##Pasos para hacer correr el proyecto de manera local
+#Pasos para hacer correr el proyecto de manera local
 * Crear virtualenv (opcional, recomendable)
 * Clonar el repo
 ```
