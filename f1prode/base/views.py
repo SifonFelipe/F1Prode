@@ -49,13 +49,8 @@ def standings(request):
     context = {'drivers': drivers}
     return render(request, 'base/standings.html', context)
 
-def championship_positions(request):
-    f1_position_data = requests.get('https://api.openf1.org/v1/position').json()
-    #f1_meetings_data = requests.get('https://api.openf1.org/v1/meetings').json()
+def predict(request):
+    drivers = Driver.objects.all()
 
-    for x in f1_position_data:
-        if x['driver_number'] == 1:
-            print(x)
-
-    context = {'positions': f1_position_data}
-    return render(request, 'base/positions.html', context)
+    context = {'drivers': drivers}
+    return render(request, 'base/predicts.html', context)
