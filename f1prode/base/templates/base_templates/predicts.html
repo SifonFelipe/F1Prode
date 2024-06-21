@@ -11,44 +11,59 @@
         <div class="card" id="{{ driver.headshot }}">
             <div class="firstHalf">
                 <img src="{{driver.headshot}}" alt="">
-                <p>{{driver.first_name}} {{driver.last_name}} position: </p>
+                <p>{{driver.first_name}} {{driver.last_name}} </p>
             </div>
             <div class="secondHalf">
                 <input class="theInput" required type="hidden" name="{{driver.first_name}}" id="{{ driver.number }}"/>
-                <div input="{{ driver.number }}"></div>
+                <div class="theDiv" input="{{ driver.number }}" id="div{{driver.id}}"></div>
             </div> 
         </div>
         <script>
             document.getElementById('{{driver.headshot}}').onclick = () => {
                 input = document.getElementById('{{driver.number}}');
+                div = document.getElementById('div{{driver.id}}');
                 if (!input.hasAttribute('hasbeenset') ) {
                     input.setAttribute('value', position);
                     input.setAttribute('hasbeenset', true);
-                    input.setAttribute('type', 'number');
+                    div.append(position);
+                    div.style.display = 'block';
                     position++;
                 } else if (input.hasAttribute('hasbeenset') && Number(input.getAttribute('value')) === position - 1){
                     input.removeAttribute('value');
                     input.removeAttribute('hasbeenset');
-                    input.setAttribute('type', 'hidden');
+                    div.innerHTML = '';
+                    div.style.display = 'none';
                     position--;
                 }
             }
         </script>
         {% endfor %}
-        <input type="submit" value="Submit" />
+        <div class="submitButtonContainer">
+            <input class="submitButton" type="submit" value="Submit" />
+        </div>
+        
     </form>
 
     <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
         .form {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
-            grid-template-rows: 1fr 1fr 1fr 1fr;
+            grid-template-columns: 200px 200px 200px 200px 200px;
+            gap: 20px;
+            grid-template-rows: 200px 200px 200px 200px;
         }
         .card {
-            border: 2px solid red;
+            border: 2.5px solid black;
+            border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
+            position: relative;
         }
         .firstHalf {
             flex: 1;
@@ -59,8 +74,7 @@
             align-items: center;
         }
         .secondHalf {
-            flex: 1;
-            height: 100%;
+            height: 100;
         }
         .theInput {
             border: 2px solid blue;
@@ -71,8 +85,24 @@
             justify-content: center;
             align-items: center;
         }
-        .theInput > div {
-            border: 2px solid green;
+        .theDiv {
+            border: 2.5px solid black;
+            border-radius: 50%;
+            display: none;
+            position: absolute;
+            top: 84%; /* Adjust this value as needed */
+            left: 50%; /* Adjust this value as needed */
+            transform: translate(-50%, -50%);
+            z-index: 30;
+            font-size: 20px;
+            width: 21px;
+            height: 21px;
+            text-align: center;
+            padding: 2px;
+            margin-top: 5px;
+        }
+        .submitButton {
+            
         }
 
     </style>

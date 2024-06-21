@@ -56,8 +56,13 @@ def standings(request):
 
 def predict(request):
     drivers = Driver.objects.all()
+    div_numbers = []
+    for driver_number in drivers:
+        number_string = str(driver_number.number)
+        id_complete = "div" + number_string
+        div_numbers.append(id_complete)
 
-    context = {'drivers': drivers}
+    context = {'drivers': drivers, "div_id": div_numbers}
     return render(request, 'base_templates/predicts.html', context)
 
 def last_race(): #tener ultima carrera
