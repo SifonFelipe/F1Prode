@@ -11,4 +11,5 @@ urlpatterns = [
     path('logout/', views.logoutView, name='logout-page'),
     path('creategroup/', views.creategroup, name='creategroup-page'),
     path('groups/<str:groupname>/', views.viewgroup, name='viewgroup-page'),
+    path('predictions/self/', views.view_prediction, name='view_prediction-page'),
 ]
