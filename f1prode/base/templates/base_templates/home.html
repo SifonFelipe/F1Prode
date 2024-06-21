@@ -1,7 +1,12 @@
 {% extends 'main.html' %}
 {% block content %}
-    <h1>Testing Api</h1>
-    {% for name in data %}
-        <p>{{name}}</p>
+    <h2>Home Template</h2>
+    {% if request.user.is_authenticated %}
+        <p>Loged</p>
+    {% endif%}
+
+    {% for group in groups %}
+        <h1><a href="{% url 'viewgroup-page' group.name%}">{{group.name}}</a></h1>
+        <p>{{group.description}}</p>
     {% endfor %}
-{% ednblock content %}
+{% endblock content %}

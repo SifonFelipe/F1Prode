@@ -1,7 +1,12 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 import json
 import requests
-from .models import Driver
+from .models import Driver, Group, Prediction
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
+
 
 """
 API documentation
@@ -18,6 +23,9 @@ for driver in f1_data_drivers: #populate database with drivers info
         headshot = driver['headshot_url']
     )
 
+    
+#se pueden hacer las request ya con una caracteristica   ?driver_number=1
+
 """
 
 positions_to_points = {
@@ -33,18 +41,15 @@ positions_to_points = {
     10: 1,
 }
 
-def register(request):
-    context = {}
-    return render(request, 'base_templates/register.html', context)
-
+@login_required()
+def logoutView(request):
+    logout(request)
+    return redirect('home')
 
 def home(request):
-    f1_data = requests.get('https://api.openf1.org/v1/drivers').json()
-    #se pueden hacer las request ya con una caracteristica   ?driver_number=1
-    #['session_key'] es el valor de cada sesion y es igual por cada participante de la sesion
-    f1_data_drivers = f1_data[-20:]
+    groups = Group.objects.all()
 
-    context = {'data': f1_data_drivers}
+    context = {'groups': groups}
     return render(request, 'base_templates/home.html', context)
 
 
@@ -56,8 +61,59 @@ def standings(request):
 
 def predict(request):
     drivers = Driver.objects.all()
+    predictions_dict = {i: None for i in range(1, 20)}
+
+    if request.method == "POST":
+        for driver in drivers:
+            prediction_input = request.POST.get(driver.first_name)
+            predictions_dict[prediction_input] = driver.number
+
+        prediction_instance = Prediction(user=request.user)
+        prediction_instance.save_prediction(predictions_dict)
+
     context = {'drivers': drivers}
     return render(request, 'base_templates/predicts.html', context)
 
-def last_race(): #tener ultima carrera
-    return None
+def view_prediction(request):
+    prediction = Prediction.objects.get(user=request.user)
+    print(prediction)
+
+    prediction_dict = prediction.get_prediction()
+    print(prediction_dict)
+
+    context = {'predictions': prediction_dict}
+    return render(request, 'base_templates/view_prediction.html', context)
+
+@login_required()
+def creategroup(request):
+    if request.method == "POST":
+        try:
+            existing_name = Group.objects.get(name=request.POST.get('name'))
+            return HttpResponse('Already exists a group with that name')
+
+        except ObjectDoesNotExist or ValueError:
+            None
+
+        group_name = request.POST.get('name')
+        group_description = request.POST.get('description')
+        host = request.user
+
+        Group.objects.create(
+            name=group_name,
+            description=group_description,
+            host=host
+        )
+
+        group = Group.objects.get(name=group_name)
+        group.participants.add(host)
+
+        return redirect('home')
+
+
+    context = {}
+    return render(request, 'base_templates/create_group.html', context)
+
+def viewgroup(request, groupname):
+    group = Group.objects.get(name=groupname)
+    context = {'group': group}
+    return render(request, 'base_templates/view_group.html', context)
