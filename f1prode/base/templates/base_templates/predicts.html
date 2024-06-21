@@ -4,66 +4,101 @@
         let position = 1;
         let inputs;
         let input;
-    </script>
-    <form method="POST" class="form">
-        {% csrf_token %}
-        {% for driver in drivers %}
-        <div class="card" id="{{ driver.headshot }}">
-            <div class="firstHalf">
-                <img src="{{driver.headshot}}" alt="">
-                <p>{{driver.first_name}} {{driver.last_name}} </p>
-            </div>
-            <div class="secondHalf">
-                <input class="theInput" required type="hidden" name="{{driver.first_name}}" id="{{ driver.number }}"/>
-                <div class="theDiv" input="{{ driver.number }}" id="div{{driver.id}}"></div>
-            </div> 
-        </div>
-        <script>
-            document.getElementById('{{driver.headshot}}').onclick = () => {
-                input = document.getElementById('{{driver.number}}');
-                div = document.getElementById('div{{driver.id}}');
-                if (!input.hasAttribute('hasbeenset') ) {
-                    input.setAttribute('value', position);
-                    input.setAttribute('hasbeenset', true);
-                    div.append(position);
-                    div.style.display = 'block';
-                    position++;
-                } else if (input.hasAttribute('hasbeenset') && Number(input.getAttribute('value')) === position - 1){
-                    input.removeAttribute('value');
-                    input.removeAttribute('hasbeenset');
-                    div.innerHTML = '';
-                    div.style.display = 'none';
-                    position--;
+        let card;
+
+        const paintIt = (id, it) => {
+            if (id % 2 == 1) {
+                console.log(it.style.background);
+                if (it.style.background == 'black') {
+                    it.style.background = 'white';
+                    it.style.color = 'black';
+                } else {
+                    it.style.background = 'black';
+                    it.style.color = 'white';
                 }
             }
-        </script>
-        {% endfor %}
+        }
+    </script>
+    <form method="POST" class="form">
+        <div class="cardsContainer">
+            {% csrf_token %}
+            {% for driver in drivers %}
+            <div
+                class="card"
+                id="card{{ driver.id }}"
+            >
+                <div class="firstHalf">
+                    <img src="{{ driver.headshot }}" alt="">
+                    <p>{{driver.first_name}} {{driver.last_name}} </p>
+                </div>
+                <div class="secondHalf">
+                    <input class="theInput" required type="hidden" name="{{ driver.first_name }}" id="input{{ driver.id }}"/>
+                    <div class="theDiv" input="{{ driver.number }}" id="div{{ driver.id }}"></div>
+                </div> 
+            </div>
+            <script>
+                document.getElementById('card{{ driver.id }}').onclick = () => {
+                    card = document.getElementById('card{{driver.id}}');
+                    input = document.getElementById('input{{driver.id}}');
+                    div = document.getElementById('div{{driver.id}}');
+                    if (!input.hasAttribute('hasbeenset') ) {
+                        input.setAttribute('value', position);
+                        input.setAttribute('hasbeenset', true);
+                        div.append(position);
+                        div.style.display = 'block';
+                        position++;
+                        paintIt('{{driver.id}}', card);
+                    } else if (input.hasAttribute('hasbeenset') && Number(input.getAttribute('value')) === position - 1){
+                        input.removeAttribute('value');
+                        input.removeAttribute('hasbeenset');
+                        div.innerHTML = '';
+                        div.style.display = 'none';
+                        position--;
+                        paintIt('{{driver.id}}', card);
+                    }
+                }
+            </script>
+            {% endfor %}
+        </div>
         <div class="submitButtonContainer">
-            <input class="submitButton" type="submit" value="Submit" />
+            <input class="submitButton orbitron" type="submit" value="Submit" />
         </div>
         
     </form>
 
     <style>
+        @font-face {
+            font-family: 'Formula_1';
+            src: url('/static/fonts/formula_1.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'Orbitron';
+            src: url('/static/fonts/Orbitron-VariableFont_wght.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        
         body {
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
+            font-family: Orbitron, sans-serif;
         }
-        .form {
-            display: grid;
-            grid-template-columns: 200px 200px 200px 200px 200px;
-            gap: 20px;
-            grid-template-rows: 200px 200px 200px 200px;
-        }
+
         .card {
-            border: 2.5px solid black;
-            border-radius: 50%;
             display: flex;
             justify-content: center;
             align-items: center;
             position: relative;
+        }
+        .card--white {
+            background-color: white;
+        }
+        .card--black {
+            background-color: black;
         }
         .firstHalf {
             flex: 1;
@@ -76,17 +111,7 @@
         .secondHalf {
             height: 100;
         }
-        .theInput {
-            border: 2px solid blue;
-            width: 100%;
-            height: 100%;
-            font-size: 4rem;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
         .theDiv {
-            border: 2.5px solid black;
             border-radius: 50%;
             display: none;
             position: absolute;
@@ -101,8 +126,38 @@
             padding: 2px;
             margin-top: 5px;
         }
+        .cardsContainer {
+            display: grid;
+            grid-template-columns: 180px 180px 180px 180px 180px;
+            grid-template-rows: 180px 180px 180px 180px;
+        }
+        .submitButtonContainer {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            margin-top: 50px;
+        }
         .submitButton {
-            
+            width: 20%;
+            height: 50px;
+            background: black;
+            color: white;
+            border: 2px solid black;
+            border-radius: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .submitButton:hover {
+            background-color: white;
+            color: black;
+        }
+        .formula1 {
+            font-family: 'formula_1';
+
+        }
+        .orbitron {
+            font-family: 'orbitron';
         }
 
     </style>
