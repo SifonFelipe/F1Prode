@@ -6,6 +6,7 @@ import requests
 from .models import Driver, Group, Prediction
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
+from datetime import datetime
 
 
 """
@@ -49,7 +50,9 @@ def logoutView(request):
 def home(request):
     groups = Group.objects.all()
 
-    context = {'groups': groups}
+    races_2024 = requests.get('https://api.openf1.org/v1/sessions?year=2024&session_name=Race').json()
+
+    context = {'groups': groups, 'races': races_2024}
     return render(request, 'base_templates/home.html', context)
 
 
@@ -64,6 +67,9 @@ def predict(request):
     predictions_dict = {i: None for i in range(1, 20)}
 
     if request.method == "POST":
+        race_selected = request.POST.get('race')
+        year = datetime.now().year
+
         for driver in drivers:
             prediction_input = request.POST.get(driver.first_name)
             predictions_dict[prediction_input] = driver.number
