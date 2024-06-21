@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import json
 import requests
-from .models import Driver, Group
+from .models import Driver, Group, Prediction
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 
@@ -61,9 +61,28 @@ def standings(request):
 
 def predict(request):
     drivers = Driver.objects.all()
+    predictions_dict = {i: None for i in range(1, 20)}
+
+    if request.method == "POST":
+        for driver in drivers:
+            prediction_input = request.POST.get(driver.first_name)
+            predictions_dict[prediction_input] = driver.number
+
+        prediction_instance = Prediction(user=request.user)
+        prediction_instance.save_prediction(predictions_dict)
 
     context = {'drivers': drivers}
     return render(request, 'base_templates/predicts.html', context)
+
+def view_prediction(request):
+    prediction = Prediction.objects.get(user=request.user)
+    print(prediction)
+
+    prediction_dict = prediction.get_prediction()
+    print(prediction_dict)
+
+    context = {'predictions': prediction_dict}
+    return render(request, 'base_templates/view_prediction.html', context)
 
 @login_required()
 def creategroup(request):
