@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+import json
 
 class Driver(models.Model):
     first_name = models.CharField(max_length=30)
@@ -25,3 +26,16 @@ class Group(models.Model):
 
     def __str__(self):
         return self.name
+
+class Prediction(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    predictions_json = models.TextField(max_length=1000)
+    #race = models.TextField(max_length=200)
+    #year = models.IntegerField()
+
+    def save_prediction(self, predictions_dict):
+        self.predictions_json = json.dumps(predictions_dict)
+        self.save()
+
+    def get_prediction(self):
+        return json.loads(self.predictions_json) if self.predictions_json else {}
