@@ -3,7 +3,10 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import json
 import requests
-from .models import Driver
+from .models import Driver, Group
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
+
 
 """
 API documentation
@@ -19,6 +22,9 @@ for driver in f1_data_drivers: #populate database with drivers info
         country = driver['country_code'],
         headshot = driver['headshot_url']
     )
+
+    
+#se pueden hacer las request ya con una caracteristica   ?driver_number=1
 
 """
 
@@ -41,9 +47,9 @@ def logoutView(request):
     return redirect('home')
 
 def home(request):
-    #se pueden hacer las request ya con una caracteristica   ?driver_number=1
+    groups = Group.objects.all()
 
-    context = {}
+    context = {'groups': groups}
     return render(request, 'base_templates/home.html', context)
 
 
@@ -59,5 +65,36 @@ def predict(request):
     context = {'drivers': drivers}
     return render(request, 'base_templates/predicts.html', context)
 
-def last_race(): #tener ultima carrera
-    return None
+@login_required()
+def creategroup(request):
+    if request.method == "POST":
+        try:
+            existing_name = Group.objects.get(name=request.POST.get('name'))
+            return HttpResponse('Already exists a group with that name')
+
+        except ObjectDoesNotExist or ValueError:
+            None
+
+        group_name = request.POST.get('name')
+        group_description = request.POST.get('description')
+        host = request.user
+
+        Group.objects.create(
+            name=group_name,
+            description=group_description,
+            host=host
+        )
+
+        group = Group.objects.get(name=group_name)
+        group.participants.add(host)
+
+        return redirect('home')
+
+
+    context = {}
+    return render(request, 'base_templates/create_group.html', context)
+
+def viewgroup(request, groupname):
+    group = Group.objects.get(name=groupname)
+    context = {'group': group}
+    return render(request, 'base_templates/view_group.html', context)
