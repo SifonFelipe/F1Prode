@@ -9,4 +9,6 @@ urlpatterns = [
     path('accounts/', include('django_registration.backends.one_step.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('logout/', views.logoutView, name='logout-page'),
+    path('creategroup/', views.creategroup, name='creategroup-page'),
+    path('groups/<str:groupname>/', views.viewgroup, name='viewgroup-page'),
 ]
