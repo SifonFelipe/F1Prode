@@ -187,15 +187,15 @@ def compare(results=dict(), predictions=dict()):
     return information
 
 def view_prediction_result(request):
-    prediction_object = Prediction.objects.get(user=request.user, race='Catalunya', year=datetime.now().year)
+    try:
+        prediction_object = Prediction.objects.get(user=request.user, race='Catalunya', year=datetime.now().year)
+        race_object = prediction_object.race_vinculated
+        results_object = RaceResult.objects.get(race_vinculated=race_object)
+    except:
+        return HttpResponse('you didnt predict yet')
+
     predictions = prediction_object.get_prediction()
-
-    race_object = prediction_object.race_vinculated
-    results_object = RaceResult.objects.get(race_vinculated=race_object)
     results = results_object.get_result()
-
-    print('results', results)
-    print('predictions', predictions)
     information = compare(results, predictions)
 
     posiciones_acertadas = information[0]
