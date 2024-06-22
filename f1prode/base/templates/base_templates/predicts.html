@@ -10,11 +10,11 @@
             if (id % 2 == 1) {
                 console.log(it.style.background);
                 if (it.style.background == 'black') {
-                    it.style.background = 'white';
+                    it.style.background = 'whitesmoke';
                     it.style.color = 'black';
                 } else {
                     it.style.background = 'black';
-                    it.style.color = 'white';
+                    it.style.color = 'whitesmoke';
                 }
             }
         }
@@ -79,15 +79,6 @@
             font-weight: normal;
             font-style: normal;
         }
-        
-        body {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-family: Orbitron, sans-serif;
-        }
-
         .card {
             display: flex;
             justify-content: center;
@@ -135,7 +126,7 @@
             display: flex;
             justify-content: center;
             width: 100%;
-            margin-top: 50px;
+            margin-top: 30px;
         }
         .submitButton {
             width: 20%;
@@ -159,6 +150,5 @@
         .orbitron {
             font-family: 'orbitron';
         }
-
     </style>
 {% endblock content %}
