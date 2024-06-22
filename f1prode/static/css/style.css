@@ -1,0 +1,212 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  .theBody {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Orbitron, sans-serif;
+    background-color: green;
+  }
+  .container {
+    display: flex;
+    flex: 4;
+    flex-direction: column;
+    height: 100vh;
+    border-left: 20px double black;
+    border-right: 20px double black;
+    background-color: whitesmoke;
+    z-index: 300;
+  }
+  .track {
+    flex: 1;
+    display: flex;
+    border-left: 20px double whitesmoke;
+    border-right: 20px double whitesmoke;
+    margin-right: 50px;
+    margin-left: 50px;
+    z-index: 300;
+    background-color: black;
+    height: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+  .car {
+    flex: 1;
+    text-align: center;
+    font-size: 100px;
+    align-self: flex-end;
+    color: whitesmoke;
+  }
+
+  .form {
+    flex: 4;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: whitesmoke;
+  }
+  @keyframes raceUp {
+    0% {
+      transform: translateY(0);
+    }
+    100% {
+      transform: translateY(-2000px);
+    }
+  }
+
+  .racingUp1 {
+    animation: raceUp 7s forwards;
+    animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+  }
+  .racingUp2 {
+    animation: raceUp 10s forwards;
+    animation-timing-function: cubic-bezier(0.39, 0.575, 0.565, 1);
+  }
+  .racingUp3 {
+    animation: raceUp 9s forwards;
+    animation-timing-function: ease-in-out;
+  }
+  .racingUp4 {
+    animation: raceUp 11s forwards;
+    animation-timing-function: ease-out;
+  }
+  .racingUp5 {
+    animation: raceUp 12s forwards;
+    animation-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  }
+  .racingUp6 {
+    animation: raceUp 8s forwards;
+    animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+  }
+  .racingUp7 {
+    animation: raceUp 4s forwards;
+    animation-timing-function: cubic-bezier(0.39, 0.575, 0.565, 1);
+  }
+  .racingUp8 {
+    animation: raceUp 7s forwards;
+    animation-timing-function: ease-in-out;
+  }
+  .racingUp9 {
+    animation: raceUp 15s forwards;
+    animation-timing-function: ease-out;
+  }
+  .racingUp10 {
+    animation: raceUp 8s forwards;
+    animation-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  }
+  @font-face {
+    font-family: "Formula_1";
+    src: url("/static/fonts/formula_1.ttf") format("truetype");
+    font-weight: normal;
+    font-style: normal;
+  }
+  @font-face {
+    font-family: "Orbitron";
+    src: url("/static/fonts/Orbitron-VariableFont_wght.ttf")
+      format("truetype");
+    font-weight: normal;
+    font-style: normal;
+  }
+  .card {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+  .firstHalf {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  .firstHalf img {
+    margin-bottom: 10px;
+  }
+  .firstHalf p {
+    margin-bottom: 10px;
+  }
+  .secondHalf {
+    height: 100;
+  }
+  .theDiv {
+    border-radius: 50%;
+    display: none;
+    position: absolute;
+    top: 84%; /* Adjust this value as needed */
+    left: 50%; /* Adjust this value as needed */
+    transform: translate(-50%, -50%);
+    z-index: 30;
+    font-size: 20px;
+    width: 21px;
+    height: 21px;
+    text-align: center;
+    padding: 2px;
+    margin-top: 5px;
+  }
+  .cardsContainer {
+    display: grid;
+    grid-template-columns: 180px 180px 180px 180px 180px;
+    grid-template-rows: 180px 180px 180px 180px;
+  }
+  .submitButtonContainer {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin-top: 30px;
+  }
+  .submitButton {
+    width: 20%;
+    height: 50px;
+    background: black;
+    color: white;
+    border: 2px solid black;
+    border-radius: 20px;
+    font-size: 1.5rem;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+  }
+  .submitButton:hover {
+    background-color: white;
+    color: black;
+  }
+  .formula1 {
+    font-family: "formula_1";
+  }
+  .orbitron {
+    font-family: "orbitron";
+  }
+  .theExtraContainer {
+    padding-bottom: 10px;
+    background-color: whitesmoke;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30px;
+  }
+  .titleContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 50px;
+    color: #da291c;
+    font-weight: 700;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 2.3rem;
+    width: 100%;
+  }
+  .marginRight {
+    margin-right: 15px;
+    color: #fff;
+    background-color: #da291c;
+    padding: 0 10px;
+    border-radius: 5px;
+  }

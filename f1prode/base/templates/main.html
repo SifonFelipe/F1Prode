@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>F1Prode</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static '/css/style.css' %}">
+    <script src="{% static '/js/script.js' %}"></script>
   </head>
   <body class="theBody">
     <div class="track">
@@ -15,9 +18,7 @@
     </div>
 
     <div class="container">
-      {% include 'top_bar.html' %} 
-      {% block content %} 
-      {% endblock content %}
+      {% include 'top_bar.html' %} {% block content %} {% endblock content %}
     </div>
     <div class="track">
       <div class="car formula1">Y</div>
@@ -26,145 +27,5 @@
       <div class="car formula1">Y</div>
       <div class="car formula1">N</div>
     </div>
-    <script>
-      const animateCars = () => {
-        const cars = document.querySelectorAll(".car");
-        let i = 1;
-        cars.forEach(car => {
-          console.log(`racingUp${i}`);
-          car.classList.add(`racingUp${i}`);
-          i++;
-        });
-      };
-      const validateForm = () => {
-        let inputList = document.querySelectorAll(".theInput");
-        let values = [];
-        for (let i = 0; i < inputList.length; i++) {
-          let value = inputList[i].value;
-          if (!value || isNaN(value) || value < 1 || value > 20) {
-            alert("All inputs must have a value between 1 and 20.");
-            return false;
-          }
-          if (values.includes(value)) {
-            alert("Duplicate values are not allowed.");
-            return false;
-          }
-          values.push(value);
-        }
-        return true;
-      };
-      document.addEventListener("DOMContentLoaded", function () {
-        const form = document.querySelector("form");
-        form.addEventListener("submit", function (event) {
-          event.preventDefault();
-          if (validateForm()) {
-            animateCars();
-          }
-        });
-      });
-    </script>
   </body>
-  <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-    }
-    .theBody {
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-family: Orbitron, sans-serif;
-      background-color: green;
-    }
-    .container {
-      display: flex;
-      flex: 4;
-      flex-direction: column;
-      height: 100vh;
-      border-left: 20px double black;
-      border-right: 20px double black;
-      background-color: whitesmoke;
-      z-index: 300;
-    }
-    .track {
-      flex: 1;
-      display: flex;
-      border-left: 20px double whitesmoke;
-      border-right: 20px double whitesmoke;
-      margin-right: 50px;
-      margin-left: 50px;
-      z-index: 300;
-      background-color: black;
-      height: 100%;
-      padding-left: 20px;
-      padding-right: 20px;
-    }
-    .car {
-      flex: 1;
-      text-align: center;
-      font-size: 100px;
-      align-self: flex-end;
-      color: whitesmoke;
-    }
-
-    .form {
-      flex: 4;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-color: whitesmoke;
-    }
-    @keyframes raceUp {
-      0% {
-        transform: translateY(0);
-      }
-      100% {
-        transform: translateY(-2000px);
-      }
-    }
-
-    .racingUp1 {
-      animation: raceUp 7s forwards;
-      animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
-    }
-    .racingUp2 {
-      animation: raceUp 10s forwards;
-      animation-timing-function: cubic-bezier(0.39, 0.575, 0.565, 1);
-    }
-    .racingUp3 {
-      animation: raceUp 9s forwards;
-      animation-timing-function: ease-in-out;
-    }
-    .racingUp4 {
-      animation: raceUp 11s forwards;
-      animation-timing-function: ease-out;
-    }
-    .racingUp5 {
-      animation: raceUp 12s forwards;
-      animation-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86);
-    }
-    .racingUp6 {
-      animation: raceUp 8s forwards;
-      animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
-    }
-    .racingUp7 {
-      animation: raceUp 4s forwards;
-      animation-timing-function: cubic-bezier(0.39, 0.575, 0.565, 1);
-    }
-    .racingUp8 {
-      animation: raceUp 7s forwards;
-      animation-timing-function: ease-in-out;
-    }
-    .racingUp9 {
-      animation: raceUp 15s forwards;
-      animation-timing-function: ease-out;
-    }
-    .racingUp10 {
-      animation: raceUp 8s forwards;
-      animation-timing-function: cubic-bezier(0.785, 0.135, 0.15, 0.86);
-    }
-  </style>
 </html>
