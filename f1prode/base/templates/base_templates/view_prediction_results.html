@@ -1,0 +1,28 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<h3>Posiciones Acertadas</h3>
+{% for acertado in posiciones_acertadas %}
+    <p>{{acertado}}</p>
+{% endfor %}
+
+<h3>Posiciones Casi Acertadas</h3>
+{% for casi_acertado in posiciones_casi_acertadas %}
+    <p>{{casi_acertado}}</p>
+{% endfor %}
+
+<h3>Puntos totales </h3>
+<p>{{puntos}}</p>
+
+<h1>Results</h1>
+{% for driver in drivers_ordenados %}
+    <img src="{{ driver.headshot }}" alt="">
+    <p>{{driver.first_name}} {{driver.last_name}} {{driver.number}}</p>
+{% endfor %}
+
+<h1>Predicts</h1>
+{% for driver in predicts_ordenadas %}
+    <img src="{{ driver.headshot }}" alt="">
+    <p>{{driver.first_name}} {{driver.last_name}} {{driver.number}}</p>
+{% endfor %}
+{% endblock content %}
