@@ -210,3 +210,12 @@
     padding: 0 10px;
     border-radius: 5px;
   }
+  .homeContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 20px;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+  }
