@@ -94,6 +94,7 @@ def update_database_race(request):
     context = {}
     return render(request, 'base_templates/update_database.html', context)
 
+@login_required
 def predict(request):
     drivers = Driver.objects.all()
     predictions_dict = {}
@@ -186,16 +187,18 @@ def compare(results=dict(), predictions=dict()):
     information.append(puntos)
     return information
 
+@login_required
 def view_prediction_result(request):
-    prediction_object = Prediction.objects.get(user=request.user, race='Catalunya', year=datetime.now().year)
-    predictions = prediction_object.get_prediction()
+    try:
+        prediction_object = Prediction.objects.get(user=request.user, race='Catalunya', year=datetime.now().year)
+        predictions = prediction_object.get_prediction()
 
-    race_object = prediction_object.race_vinculated
-    results_object = RaceResult.objects.get(race_vinculated=race_object)
-    results = results_object.get_result()
+        race_object = prediction_object.race_vinculated
+        results_object = RaceResult.objects.get(race_vinculated=race_object)
+        results = results_object.get_result()
+    except:
+        return HttpResponse('you have to load them')
 
-    print('results', results)
-    print('predictions', predictions)
     information = compare(results, predictions)
 
     posiciones_acertadas = information[0]
