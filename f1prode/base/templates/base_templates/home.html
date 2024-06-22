@@ -10,8 +10,6 @@
         <p>{{group.description}}</p>
     {% endfor %}
 
-    {% for race in races %}
-        <h2>{{race.circuit_short_name}}</h2>
-        <p>{{race.country_name}}</p>
-    {% endfor %}
+    <h2><a href="{% url 'predictions-page' %}">Predict your results</a></h2>
+    <h2><a href="{% url 'view-prediction-page' %}">See your predictions results</a></h2>
 {% endblock content %}
