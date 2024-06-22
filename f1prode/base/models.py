@@ -30,8 +30,9 @@ class Group(models.Model):
 class Prediction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     predictions_json = models.TextField(max_length=1000)
-    #race = models.TextField(max_length=200)
-    #year = models.IntegerField()
+    race = models.TextField(max_length=200)
+    year = models.IntegerField() 
+    race_vinculated = models.ForeignKey('RaceInformation', on_delete=models.CASCADE)
 
     def save_prediction(self, predictions_dict):
         self.predictions_json = json.dumps(predictions_dict)
@@ -39,3 +40,19 @@ class Prediction(models.Model):
 
     def get_prediction(self):
         return json.loads(self.predictions_json) if self.predictions_json else {}
+
+class RaceInformation(models.Model):
+    race_name = models.TextField(max_length=200)
+    year = models.IntegerField()
+    race_start = models.DateTimeField()
+
+class RaceResult(models.Model):
+    results = models.TextField(max_length=1000)
+    race_vinculated = models.OneToOneField(RaceInformation, on_delete=models.CASCADE)
+
+    def save_result(self, race_results):
+        self.results = json.dumps(race_results)
+        self.save()
+
+    def get_result(self):
+        return json.loads(self.results) if self.results else {}
