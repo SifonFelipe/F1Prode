@@ -3,6 +3,9 @@
     padding: 0;
     box-sizing: border-box;
   }
+  a, a:hover {
+    text-decoration: none;
+  }
   .theBody {
     height: 100vh;
     display: flex;
@@ -182,34 +185,7 @@
   .orbitron {
     font-family: "orbitron";
   }
-  .theExtraContainer {
-    padding-bottom: 10px;
-    background-color: whitesmoke;
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 30px;
-  }
-  .titleContainer {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 50px;
-    color: #da291c;
-    font-weight: 700;
-    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-    text-transform: uppercase;
-    letter-spacing: 2.3rem;
-    width: 100%;
-  }
-  .marginRight {
-    margin-right: 15px;
-    color: #fff;
-    background-color: #da291c;
-    padding: 0 10px;
-    border-radius: 5px;
-  }
+
   .homeContainer {
     display: flex;
     flex-direction: column;
@@ -218,4 +194,44 @@
     align-items: center;
     height: 100%;
     width: 100%;
+  }
+  .theExtraContainer {
+    background-color: whitesmoke;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+  }
+  .titleContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 30px;
+    color: #da291c;
+    font-weight: 700;
+    text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    text-transform: uppercase;
+    letter-spacing: 0.2rem;
+  }
+  .marginRight {
+    margin-right: 15px;
+    color: #fff;
+    background-color: #da291c;
+    padding: 0 10px;
+    border-radius: 5px;
+  }
+  li {
+    list-style: none;
+  }
+  header {
+    display: flex;
+    margin-top: 30px;
+    margin-left: 5%;
+    margin-right: 5%;
+  }
+  nav {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    flex: 2;
   }

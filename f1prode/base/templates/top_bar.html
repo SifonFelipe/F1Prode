@@ -1,3 +1,16 @@
-<span class="theExtraContainer">
-    <h1 class="titleContainer"><p class="formula1 marginRight">,</p><p>F1-Prode</p></h1>
-</span>
+<header>
+  <div class="theExtraContainer">
+    <a class="titleContainer" href="{% url 'home' %}">
+      <p class="formula1 marginRight">,</p>
+      <p>F1-Prode</p>
+    </a>
+</div>
+  <nav>
+    <li><a href="{% url 'predictions-page' %}">Predict your results</a></li>
+    <li>
+      <a href="{% url 'view-prediction-page' %}"
+        >See your predictions results</a
+      >
+    </li>
+  </nav>
+</header>
