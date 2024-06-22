@@ -116,11 +116,38 @@
     font-style: normal;
   }
   .card {
-    display: flex;
+    display: inline-block;
     justify-content: center;
     align-items: center;
     position: relative;
+    transition: transform 0.2s ease-in-out;
+    cursor: pointer;
   }
+  .card:hover {
+    animation: vibrate 0.3s ease-in-out;
+  }
+
+  @keyframes vibrate {
+    0% {
+      transform: translate(0);
+    }
+    20% {
+      transform: translate(-2px, -2px);
+    }
+    40% {
+      transform: translate(2px, 2px);
+    }
+    60% {
+      transform: translate(-2px, -2px);
+    }
+    80% {
+      transform: translate(2px, 2px);
+    }
+    100% {
+      transform: translate(0);
+    }
+  }
+
   .firstHalf {
     flex: 1;
     height: 100%;
