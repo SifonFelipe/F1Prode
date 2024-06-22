@@ -4,12 +4,13 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
-    path('standings/', views.standings, name='standings_page'),
-    path('predictions/', views.predict, name='predictions_page'),
+    path('predictions/', views.predict, name='predictions-page'),
     path('accounts/', include('django_registration.backends.one_step.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('logout/', views.logoutView, name='logout-page'),
     path('creategroup/', views.creategroup, name='creategroup-page'),
     path('groups/<str:groupname>/', views.viewgroup, name='viewgroup-page'),
-    path('predictions/self/', views.view_prediction, name='view_prediction-page'),
+    path('predictions/self/', views.view_prediction_result, name='view-prediction-page'),
+    path('updatedatabase/race/', views.update_database_race, name='update-database-race'),
+    path('updatedatabase/results/', views.update_database_results, name='update-database-results')
 ]
