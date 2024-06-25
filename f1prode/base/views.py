@@ -3,7 +3,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import json
 import requests
-from .models import Driver, Group, Prediction, RaceResult, RaceInformation
+from .models import Driver, Group, Prediction, RaceResult, RaceInformation, Profile
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from datetime import datetime, timedelta, timezone
@@ -45,51 +45,52 @@ def transformint(dictionary=dict()):
 
     return new_dict
 
+def order_dict(dictionary=dict()):
+    new_dict = {i: None for i in range(1, 21)}
+    for dict_key in dictionary:
+        new_dict[dict_key] = dictionary[dict_key]
 
-def update_database_results(request):
+    return new_dict
+
+def get_results(request):
     if request.method == "POST":
-        race_name = request.POST.get('race-name')
-        year = datetime.now().year
+        if request.user.username == 'sifon':
+            race_vinculated = RaceInformation.objects.latest('-race_start')
+            race_vinculated_session_key = race_vinculated.session_key
+            results = requests.get(f'https://api.openf1.org/v1/position?session_key={race_vinculated_session_key}').json()
 
-        race_vinculated = RaceInformation.objects.get(race_name=race_name, year=year)
-        result_static = {1: 11, 2: 22, 3: 55, 4: 44, 5: 23, 6: 24, 7: 63, 8: 77, 9: 81, 10: 20, 11: 27, 12: 31, 13: 18, 14: 16, 15: 14, 16: 10, 17: 4, 18: 3, 19: 2, 20: 1}
+            dict_positions = {i: None for i in range(1, 21)}
+            for driver in reversed(results):
+                if dict_positions[driver['position']] == None:
+                    dict_positions[driver['position']] = driver['driver_number']
 
-        instance = RaceResult.objects.create(race_vinculated=race_vinculated)
-        instance.save_result(result_static)
+            dict_ordenado = order_dict(dict_positions)
 
-    return render(request, 'base_templates/update_database_results.html')
+            instance = RaceResult.objects.create(race_vinculated=race_vinculated)
+            instance.save_result(dict_ordenado)
+
+    return render(request, 'base_templates/get_results.html')
 
 def update_database_race(request):
     if request.method == "POST":
-        race_name = request.POST.get('race-name') #circuit short name
-        year = datetime.now().year
+        if request.user.username == 'sifon':
+            race_name = request.POST.get('race-name') #circuit short name
+            year = datetime.now().year
+            
+            race = requests.get(f"https://api.openf1.org/v1/sessions?year={year}&session_name=Practice 1&circuit_short_name={race_name}").json()
         
-        race = requests.get(f"https://api.openf1.org/v1/sessions?year={year}&session_name=Race&circuit_short_name={race_name}").json()
-    
-        if race != []:
-            hoy = datetime.now(timezone.utc)
-            hoy_format = hoy.replace(tzinfo=timezone.utc).astimezone(tz=timezone(timedelta(hours=0)))
-            check_time = race[0]['date_start']
-            start_time = datetime.fromisoformat(check_time)
+            if race != []:
+                check_time = race[0]['date_start']
+                start_time = datetime.fromisoformat(check_time) + timedelta(hours=47)
 
-            if start_time > hoy_format:
-                return HttpResponse('The race has already started')
-            else:
+                session_key = race[0]['session_key'] + 7
+
                 RaceInformation.objects.create(
                     race_name = race_name,
                     year = year,
                     race_start = start_time,
+                    session_key = session_key,
                 )
-        else:
-            practice = requests.get(f"https://api.openf1.org/v1/sessions?year={year}&session_name=Practice%201&circuit_short_name={race_name}").json()
-            check_time = practice[0]['date_start']
-            start_time = datetime.fromisoformat(check_time) + timedelta(hours=46)
-
-            RaceInformation.objects.create(
-                race_name = race_name,
-                year = year,
-                race_start = start_time,
-            )
 
     context = {}
     return render(request, 'base_templates/update_database.html', context)
@@ -99,13 +100,13 @@ def predict(request):
     predictions_dict = {}
 
     if request.method == "POST":
-        race_selected = 'Catalunya'
-        year = datetime.now().year
-        try:
-            existing_prediction = Prediction.objects.get(race=race_selected, year=year, user=request.user)
-            existing_prediction.delete()
-        except:
-            None
+        race_selected = RaceInformation.objects.latest('-race_start')
+
+        race_start = race_selected.race_start
+        hoy = datetime.now(timezone.utc)
+        hoy_format = hoy.replace(tzinfo=timezone.utc).astimezone(tz=timezone(timedelta(hours=0)))
+        #if hoy_format > race_start:
+            #return HttpResponse('The race has already started')
 
         predictions_inputs = []
         drivers_numbers = []
@@ -121,33 +122,27 @@ def predict(request):
                 return HttpResponse('No pusiste todos los resultados!!!')
             
         try:
-            race = RaceInformation.objects.get(race_name=race_selected, year=year)
-            race_start = race.race_start
-
-            hoy = datetime.now(timezone.utc)
-            hoy_format = hoy.replace(tzinfo=timezone.utc).astimezone(tz=timezone(timedelta(hours=0)))
-            if hoy_format > race_start:
-                return HttpResponse('The race has already started')
+            existing_prediction = Prediction.objects.get(race_vinculated=race_selected, user=request.user)
+            existing_prediction.delete()
         except:
-            return HttpResponse('You cant predict now, wait')
+            None    
 
         predictions_dict = makedict(predictions_inputs, drivers_numbers)
-        race_main = RaceInformation.objects.get(race_name=race_selected, year=year)
 
         prediction_instance = Prediction.objects.create(
             user=request.user,
-            race=race_selected,
-            year=year,
-            race_vinculated=race_main,
+            race=race_selected.race_name,
+            year=race_selected.year,
+            race_vinculated=race_selected,
         )
 
         prediction_instance.save_prediction(predictions_dict)
+        return redirect('home')
 
     context = {'drivers': drivers}
     return render(request, 'base_templates/predicts.html', context)
 
 def compare(results=dict(), predictions=dict()):
-    puntos = 0
     acertados = 0
     casi_acertados = 0
 
@@ -162,24 +157,22 @@ def compare(results=dict(), predictions=dict()):
         predict = predictions[predict_key]
 
         if result == predict:
-            puntos += 3
             acertados += 1
             posiciones_acertadas.append(predict_key)
         elif result_key != 1 and result_key != 20:
             if predict == results[result_key + 1] or predict == results[result_key - 1]:
-                puntos += 1
                 casi_acertados += 1
                 posiciones_casi_acertadas.append(predict_key)
         elif result_key == 1:
             if predict == results[result_key + 1]:
-                puntos += 1
                 casi_acertados += 1
                 posiciones_casi_acertadas.append(predict_key)
         elif result_key == 20:
             if predict == results[result_key - 1]:
-                puntos += 1
                 casi_acertados += 1
                 posiciones_casi_acertadas.append(predict_key)
+
+    puntos = acertados * 3 + casi_acertados
 
     information.append(posiciones_acertadas)
     information.append(posiciones_casi_acertadas)
@@ -188,11 +181,11 @@ def compare(results=dict(), predictions=dict()):
 
 def view_prediction_result(request):
     try:
-        prediction_object = Prediction.objects.get(user=request.user, race='Catalunya', year=datetime.now().year)
-        race_object = prediction_object.race_vinculated
+        race_object = RaceInformation.objects.latest('-race_start')
+        prediction_object = Prediction.objects.get(user=request.user, race_vinculated=race_object)
         results_object = RaceResult.objects.get(race_vinculated=race_object)
     except:
-        return HttpResponse('you didnt predict yet')
+        return HttpResponse('you didnt predict yet or the race didnt end')
 
     predictions = prediction_object.get_prediction()
     results = results_object.get_result()
@@ -201,6 +194,10 @@ def view_prediction_result(request):
     posiciones_acertadas = information[0]
     posiciones_casi_acertadas = information[1]
     puntos = information[2]
+
+    if prediction_object.points_gained == 0:
+        prediction_object.points_gained = puntos
+        prediction_object.save()
 
     driver_objects_ordenados = []
     predicts_ordenadas = []
