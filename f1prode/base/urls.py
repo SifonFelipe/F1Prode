@@ -12,5 +12,5 @@ urlpatterns = [
     path('groups/<str:groupname>/', views.viewgroup, name='viewgroup-page'),
     path('predictions/self/', views.view_prediction_result, name='view-prediction-page'),
     path('updatedatabase/race/', views.update_database_race, name='update-database-race'),
-    path('updatedatabase/results/', views.update_database_results, name='update-database-results')
+    path('getresults/', views.get_results, name='getresults')
 ]
