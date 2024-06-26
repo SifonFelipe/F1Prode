@@ -3,11 +3,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 import json
 import requests
-from .models import Driver, Group, Prediction, RaceResult, RaceInformation, Profile
+from .models import Driver, Group, Prediction, RaceResult, RaceInformation, Profile, GroupJoinRequests, GroupDetails
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import HttpResponse
 from datetime import datetime, timedelta, timezone
-
+from django.contrib.auth.models import Group, User
+from django.contrib import messages
 
 """
 API documentation
@@ -146,7 +147,6 @@ def compare(results=dict(), predictions=dict()):
     acertados = 0
     casi_acertados = 0
 
-    information = []
     posiciones_acertadas = []
     posiciones_casi_acertadas = []
     results = transformint(results)
@@ -173,10 +173,7 @@ def compare(results=dict(), predictions=dict()):
                 posiciones_casi_acertadas.append(predict_key)
 
     puntos = acertados * 3 + casi_acertados
-
-    information.append(posiciones_acertadas)
-    information.append(posiciones_casi_acertadas)
-    information.append(puntos)
+    information = [posiciones_acertadas, posiciones_casi_acertadas, puntos]
     return information
 
 def view_prediction_result(request):
@@ -213,48 +210,86 @@ def view_prediction_result(request):
     context = {'predicts_ordenadas': predicts_ordenadas, 'drivers_ordenados': driver_objects_ordenados,'posiciones_acertadas': posiciones_acertadas, 'posiciones_casi_acertadas': posiciones_casi_acertadas, 'puntos': puntos}
     return render(request, 'base_templates/view_prediction_results.html', context)
 
-
-@login_required
-def creategroup(request):
-    if request.method == "POST":
-        try:
-            existing_name = Group.objects.get(name=request.POST.get('name'))
-            return HttpResponse('Already exists a group with that name')
-
-        except ObjectDoesNotExist or ValueError:
-            None
-
-        group_name = request.POST.get('name')
-        group_description = request.POST.get('description')
-        host = request.user
-
-        Group.objects.create(
-            name=group_name,
-            description=group_description,
-            host=host
-        )
-
-        group = Group.objects.get(name=group_name)
-        group.participants.add(host)
-
-        return redirect('home')
-
-    context = {}
-    return render(request, 'base_templates/create_group.html', context)
-
-@login_required
-def viewgroup(request, groupname):
-    group = Group.objects.get(name=groupname)
-    context = {'group': group}
-    return render(request, 'base_templates/view_group.html', context)
-
 @login_required()
 def logoutView(request):
     logout(request)
     return redirect('home')
 
 def home(request):
-    groups = Group.objects.all()
+    return render(request, 'base_templates/home.html')
 
+def create_groups(request):
+    if request.method == "POST":
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        host = request.user
+        
+        group = Group.objects.create(name=name)
+
+        group_details = GroupDetails.objects.create(
+            group=group,
+            host=host,
+            description=description,
+        )
+
+        group_details.participants.clear()
+        group_details.participants.add(host)
+
+    return render(request, 'base_templates/create_group.html')
+
+def see_groups(request):
+    groups = Group.objects.all()
     context = {'groups': groups}
-    return render(request, 'base_templates/home.html', context)
+    return render(request, 'base_templates/groups.html', context)
+
+def view_group(request, group_id):
+    group = Group.objects.get(id=group_id)
+    group_details = GroupDetails.objects.get(group=group)
+
+    for user in group_details.participants.all():
+        print(user.username)
+
+    context = {'group': group}
+    return render(request, 'base_templates/view_group.html', context)
+
+@login_required
+def request_group_join(request, group_id):
+    group = Group.objects.get(id=group_id)
+    existing_request = GroupJoinRequests.objects.filter(user=request.user, group=group)
+    
+    if not existing_request:
+        GroupJoinRequests.objects.create(user=request.user, group=group)
+
+    return redirect('home')
+
+def manage_group_requests(request):
+    if request.method == "POST":
+        
+        for key in request.POST.keys():
+            if request.POST[key] in ['Accept', 'Reject']:
+                request_touched = GroupJoinRequests.objects.get(id=key)
+
+                if request.POST[key] == 'Accept':
+                    user = request_touched.user
+                    group_to_add = GroupDetails.objects.get(group=request_touched.group)
+                    group_to_add.participants.add(user)
+    
+                request_touched.delete()
+                break
+
+    try:
+        get_groups = GroupDetails.objects.filter(host=request.user)
+        has_groups = True
+    except:
+        has_groups = False
+
+    if has_groups == True:
+        group_requests_dict = {i.group: [] for i in get_groups}
+
+        for group in get_groups:
+            group_requests = GroupJoinRequests.objects.filter(group=group.group)
+            for join_request in group_requests:
+                group_requests_dict[group.group].append(join_request)
+
+    context = {'has_groups': has_groups, 'requests': group_requests_dict}
+    return render(request, 'base_templates/manage_requests.html', context)
