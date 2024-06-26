@@ -2,14 +2,12 @@
 <div class="homeContainer">
   {% if request.user.is_authenticated %}
   <p>Loged</p>
-  {% endif%} {% for group in groups %}
-  <h1><a href="{% url 'viewgroup-page' group.name%}">{{group.name}}</a></h1>
-  <p>{{group.description}}</p>
-  {% endfor %}
+  {% endif%} 
 
   <h2><a href="{% url 'predictions-page' %}">Predict your results</a></h2>
   <h2>
     <a href="{% url 'view-prediction-page' %}">See your predictions results</a>
   </h2>
+
 </div>
 {% endblock content %}

@@ -4,10 +4,11 @@
 
 <form method="POST">
     {% csrf_token %}
-    <input required type="text" name="name" placeholder="Enter group name" />
-    <input required type="text" name="description" placeholder="Enter group description" />
+    <p>Group Name</p>
+    <input required type="text" placeholder="Enter group name" name="name" />
+    <p>Group Description</p>
+    <input required type="text" placeholder="Enter group description" name="description" />
     <input type="submit" value="Create Group" />
 </form>
-
 
 {% endblock content %}
