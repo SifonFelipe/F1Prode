@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 import json
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -15,19 +15,6 @@ class Driver(models.Model):
 
     def __str__(self):
         return self.last_name
-    
-class Group(models.Model):
-    host = models.ForeignKey(User, on_delete=models.CASCADE)
-    name = models.CharField(max_length=50)
-    description = models.TextField(max_length=500)
-    participants = models.ManyToManyField(User, related_name='participants', blank=True)
-    created = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        ordering = ['-created']
-
-    def __str__(self):
-        return self.name
 
 class Prediction(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -63,7 +50,16 @@ class RaceResult(models.Model):
 
     def get_result(self):
         return json.loads(self.results) if self.results else {}
-    
+
+class GroupJoinRequests(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    state = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.user.username} a {self.group.name}'
+
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     points = models.IntegerField(default=0)
@@ -79,3 +75,12 @@ def createProfile(sender, instance, created, **kwargs):
     if created:
         user_profile = Profile(user=instance)
         user_profile.save()
+
+class GroupDetails(models.Model):
+    group = models.OneToOneField(Group, on_delete=models.CASCADE)
+    host = models.ForeignKey(User, on_delete=models.CASCADE, related_name='created_groups')
+    description = models.TextField(max_length=1000)
+    participants = models.ManyToManyField(User, related_name='participants', blank=True)
+    
+    def __str__(self):
+        return self.group.name
