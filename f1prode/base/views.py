@@ -216,11 +216,23 @@ def view_prediction_result(request):
         driver = Driver.objects.get(number=results[result])
         driver_ordenados.append(driver)
 
+
     for predict in predictions:
         driver_predict = Driver.objects.get(number=predictions[predict])
         predicts_ordenadas.append(driver_predict)
 
-    context = {'drivers_ordenados': driver_ordenados, 'predicts_ordenadas': predicts_ordenadas, 'puntos': prediction_object.points_gained}
+    hits = compare(results, predictions)
+    predicts_color = {x: 'red' for x in predicts_ordenadas}
+
+    for hitted in hits[0]:
+        get_hit = predicts_ordenadas[hitted-1]
+        predicts_color[get_hit] = 'green'
+
+    for hitted in hits[1]:
+        get_hit = predicts_ordenadas[hitted-1]
+        predicts_color[get_hit] = 'yellow'
+
+    context = {'drivers_ordenados': driver_ordenados, 'predicts': predicts_color, 'puntos': prediction_object.points_gained}
     return render(request, 'base_templates/view_prediction_results.html', context)
 
 @login_required()
@@ -271,7 +283,10 @@ def view_group(request, group_id):
 
     users_list.reverse()
 
-    context = {'group': group_details, 'participants': users_list, 'group_object': group}
+    if request.method == "POST":
+        group_details.participants.remove(request.user)
+
+    context = {'group': group_details, 'participants': users_list, 'group_object': group, 'users': users}
     return render(request, 'base_templates/view_group.html', context)
 
 @login_required
