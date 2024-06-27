@@ -66,6 +66,9 @@ class Profile(models.Model):
     successful_predicts = models.IntegerField(default=0)
     almost_predicts = models.IntegerField(default=0)
 
+    class Meta:
+        ordering = ['points']
+
     def __str__(self):
         return self.user.username
 
