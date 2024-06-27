@@ -1,8 +1,31 @@
 {% extends 'main.html' %}
 
 {% block content %}
+<style>
+    .ranking-table {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
 
-<h1>{{group.name}} </h1>
-<a href="{% url 'request-group-page' group.id %}">Request to Join</a>
+    .border-ranking-table {
+        border: 1px solid black;
+        border-collapse: collapse;
+    }
+</style>
+<h1>{{group.group.name}} </h1>
+<a href="{% url 'request-group-page' group_object.id %}">Request to Join</a>
 
+<table class="ranking-table">
+    <tr>
+        <th class="border-ranking-table">User</th>
+        <th class="border-ranking-table">Points</th>
+    </tr>
+
+    {% for person in participants %}
+    <tr>
+        <td class="border-ranking-table">{{person.user.username}}</td>
+        <td class="border-ranking-table">{{person.points}}</td>
+    </tr>
+    {% endfor %}
+</table>
 {% endblock content %}
