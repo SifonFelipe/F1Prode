@@ -53,6 +53,40 @@ def order_dict(dictionary=dict()):
 
     return new_dict
 
+def compare(results=dict(), predictions=dict()):
+    acertados = 0
+    casi_acertados = 0
+
+    posiciones_acertadas = []
+    posiciones_casi_acertadas = []
+    results = transformint(results)
+    predictions = transformint(predictions)
+
+    for result_key, predict_key in zip(results, predictions):
+        result = results[result_key]
+        predict = predictions[predict_key]
+
+        if result == predict:
+            acertados += 1
+            posiciones_acertadas.append(predict_key)
+        elif result_key != 1 and result_key != 20:
+            if predict == results[result_key + 1] or predict == results[result_key - 1]:
+                casi_acertados += 1
+                posiciones_casi_acertadas.append(predict_key)
+        elif result_key == 1:
+            if predict == results[result_key + 1]:
+                casi_acertados += 1
+                posiciones_casi_acertadas.append(predict_key)
+        elif result_key == 20:
+            if predict == results[result_key - 1]:
+                casi_acertados += 1
+                posiciones_casi_acertadas.append(predict_key)
+
+    puntos = acertados * 3 + casi_acertados
+    information = [posiciones_acertadas, posiciones_casi_acertadas, puntos]
+    return information
+
+
 def get_results(request):
     if request.method == "POST":
         if request.user.username == 'sifon':
@@ -67,8 +101,30 @@ def get_results(request):
 
             dict_ordenado = order_dict(dict_positions)
 
-            instance = RaceResult.objects.create(race_vinculated=race_vinculated)
-            instance.save_result(dict_ordenado)
+            result = RaceResult.objects.create(race_vinculated=race_vinculated)
+            result.save_result(dict_ordenado)
+
+            results = result.get_result()
+
+            race_predictions = Prediction.objects.filter(race_vinculated=race_vinculated)
+
+            for race_prediction in race_predictions:
+                user = race_prediction.user
+                user_profile = Profile.objects.get(user=user)
+    
+                user_predictions_dict = race_prediction.get_prediction()
+                prediction_results = compare(results, user_predictions_dict)
+                race_prediction.points_gained = prediction_results[2]
+                race_prediction.save()
+
+                user_predictions = Prediction.objects.filter(user=user)
+                points_to_set = 0
+
+                for user_prediction in user_predictions:
+                    points_to_set += user_prediction.points_gained
+
+                user_profile.points = points_to_set
+                user_profile.save()
 
     return render(request, 'base_templates/get_results.html')
 
@@ -143,39 +199,6 @@ def predict(request):
     context = {'drivers': drivers}
     return render(request, 'base_templates/predicts.html', context)
 
-def compare(results=dict(), predictions=dict()):
-    acertados = 0
-    casi_acertados = 0
-
-    posiciones_acertadas = []
-    posiciones_casi_acertadas = []
-    results = transformint(results)
-    predictions = transformint(predictions)
-
-    for result_key, predict_key in zip(results, predictions):
-        result = results[result_key]
-        predict = predictions[predict_key]
-
-        if result == predict:
-            acertados += 1
-            posiciones_acertadas.append(predict_key)
-        elif result_key != 1 and result_key != 20:
-            if predict == results[result_key + 1] or predict == results[result_key - 1]:
-                casi_acertados += 1
-                posiciones_casi_acertadas.append(predict_key)
-        elif result_key == 1:
-            if predict == results[result_key + 1]:
-                casi_acertados += 1
-                posiciones_casi_acertadas.append(predict_key)
-        elif result_key == 20:
-            if predict == results[result_key - 1]:
-                casi_acertados += 1
-                posiciones_casi_acertadas.append(predict_key)
-
-    puntos = acertados * 3 + casi_acertados
-    information = [posiciones_acertadas, posiciones_casi_acertadas, puntos]
-    return information
-
 def view_prediction_result(request):
     try:
         race_object = RaceInformation.objects.latest('-race_start')
@@ -184,30 +207,20 @@ def view_prediction_result(request):
     except:
         return HttpResponse('you didnt predict yet or the race didnt end')
 
-    predictions = prediction_object.get_prediction()
-    results = results_object.get_result()
-    information = compare(results, predictions)
-
-    posiciones_acertadas = information[0]
-    posiciones_casi_acertadas = information[1]
-    puntos = information[2]
-
-    if prediction_object.points_gained == 0:
-        prediction_object.points_gained = puntos
-        prediction_object.save()
-
-    driver_objects_ordenados = []
+    driver_ordenados = []
     predicts_ordenadas = []
+    results = results_object.get_result()
+    predictions = prediction_object.get_prediction()
 
     for result in results:
         driver = Driver.objects.get(number=results[result])
-        driver_objects_ordenados.append(driver)
+        driver_ordenados.append(driver)
 
     for predict in predictions:
         driver_predict = Driver.objects.get(number=predictions[predict])
         predicts_ordenadas.append(driver_predict)
 
-    context = {'predicts_ordenadas': predicts_ordenadas, 'drivers_ordenados': driver_objects_ordenados,'posiciones_acertadas': posiciones_acertadas, 'posiciones_casi_acertadas': posiciones_casi_acertadas, 'puntos': puntos}
+    context = {'drivers_ordenados': driver_ordenados, 'predicts_ordenadas': predicts_ordenadas, 'puntos': prediction_object.points_gained}
     return render(request, 'base_templates/view_prediction_results.html', context)
 
 @login_required()
@@ -245,11 +258,20 @@ def see_groups(request):
 def view_group(request, group_id):
     group = Group.objects.get(id=group_id)
     group_details = GroupDetails.objects.get(group=group)
+    users = [x for x in group_details.participants.all()]
 
-    for user in group_details.participants.all():
-        print(user.username)
+    points_list = []
+    users_list = []
+    for user in users:
+        instance_profile = Profile.objects.get(user=user)
+        points_user = instance_profile.points
+        points_list.append(points_user)
+        points_list.sort()
+        users_list.insert(points_list.index(points_user), instance_profile)
 
-    context = {'group': group}
+    users_list.reverse()
+
+    context = {'group': group_details, 'participants': users_list, 'group_object': group}
     return render(request, 'base_templates/view_group.html', context)
 
 @login_required
