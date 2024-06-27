@@ -13,7 +13,15 @@
     }
 </style>
 <h1>{{group.group.name}} </h1>
+{% if request.user not in users %}
 <a href="{% url 'request-group-page' group_object.id %}">Request to Join</a>
+{% else %}
+<form method="POST">
+    {% csrf_token %}
+    <input type="submit" value="Leave Group" name="leave" />
+</form>
+{% endif %}
+
 
 <table class="ranking-table">
     <tr>
