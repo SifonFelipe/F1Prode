@@ -22,7 +22,9 @@ class Prediction(models.Model):
     race = models.TextField(max_length=70)
     year = models.IntegerField() 
     race_vinculated = models.ForeignKey('RaceInformation', on_delete=models.CASCADE)
-    points_gained = models.IntegerField(default=0)
+    points_gained = models.IntegerField(default=0) #post-race
+    succesfull = models.IntegerField(default=0) #post-race
+    almost_succesfull = models.IntegerField(default=0) #post-race
 
     def save_prediction(self, predictions_dict):
         self.predictions_json = json.dumps(predictions_dict)
